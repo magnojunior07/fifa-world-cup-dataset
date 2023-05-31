@@ -3,6 +3,7 @@ import os
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi_sqlalchemy import DBSessionMiddleware, db
+from sqlalchemy.sql.expression import or_
 from db.models.models import *
 
 app = FastAPI()
@@ -63,7 +64,7 @@ async def get_tournaments_by_winner(winner):
     tournament.start_date = formate_date(tournament.start_date)
     tournament.end_date = formate_date(tournament.end_date)
     if tournament is None:
-        raise HTTPException(status_code=404, detail="This country never winner a worldcup")
+        raise HTTPException(status_code=404, detail="This country never win a worldcup")
 
     return tournament
 
@@ -79,6 +80,17 @@ async def get_matches_by_tournament(tournament_id):
     matches = db.session.query(Matches).filter_by(tournament_id=tournament_id).all()
     for match in matches:
         match.match_date = formate_date(float(match.match_date))
+    return matches
+
+@app.get('/matches/country/{country}')
+async def get_matches_by_country(country):
+    country = db.session.query(Teams.team_id).filter(Teams.team_name.ilike(country)).first()
+    matches = db.session.query(Matches).filter(or_(Matches.home_team_id.ilike(country.team_id), Matches.away_team_id.ilike(country.team_id))).all()
+    for match in matches:
+        match.match_date = formate_date(float(match.match_date))
+    if matches is None:
+        raise HTTPException(status_code=404, detail="This country never played a wordcup game")
+
     return matches
 
 if __name__ == "__main__":
