@@ -10,7 +10,7 @@ class FormateDateColumn(Column):
     def process_bind_param(self, value, dialect):
         if value is not None:
             if isinstance(value, datetime):
-                reference_date = datetime(2000, 1, 1)
+                reference_date = datetime(1970, 1, 1)
                 delta = value - reference_date
                 value = delta.days
         return value
