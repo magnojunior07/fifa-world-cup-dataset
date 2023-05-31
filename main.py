@@ -82,6 +82,12 @@ async def get_matches_by_tournament(tournament_id):
         match.match_date = formate_date(float(match.match_date))
     return matches
 
+@app.get('/match/{id}')
+async def get_matches_by_tournament(id):
+    match = db.session.query(Matches).filter_by(match_id=id).first()    
+    match.match_date = formate_date(float(match.match_date))
+    return match
+
 @app.get('/matches/country/{country}')
 async def get_matches_by_country(country):
     country = db.session.query(Teams.team_id).filter(Teams.team_name.ilike(country)).first()
@@ -92,6 +98,18 @@ async def get_matches_by_country(country):
         raise HTTPException(status_code=404, detail="This country never played a wordcup game")
 
     return matches
+
+@app.get('/country/matches/{country}')
+async def get_matches_by_country(country):
+    country = db.session.query(Teams).filter(Teams.team_name.ilike(country)).first()
+    matches = db.session.query(TeamAppearances).filter_by(team_id=country.team_id).all()
+
+    if matches is None:
+        raise HTTPException(status_code=404, detail="This country never played a wordcup game")
+
+    return matches
+
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
