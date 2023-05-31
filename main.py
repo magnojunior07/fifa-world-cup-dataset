@@ -131,7 +131,7 @@ async def get_players():
 
 @app.get('/players/{player_name}')
 async def get_player_by_name(player_name):
-    players = db.session.query(Players).filter(or_(Players.given_name.ilike(player_name), Players.family_name.ilike(player_name)))
+    players = db.session.query(Players).filter(or_(Players.given_name.ilike(player_name), Players.family_name.ilike(player_name))).all()
     
     if players is None:
         raise HTTPException(status_code=404, detail="Player not found")
