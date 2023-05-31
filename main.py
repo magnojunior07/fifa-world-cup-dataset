@@ -119,5 +119,25 @@ async def get_goals_by_tournament(tournament_id):
     goals = db.session.query(Goals).filter_by(tournament_id=tournament_id).all()
     return goals
 
+@app.get('/player/{player_id}/goals')
+async def get_goals_by_player(player_id):
+    goals = db.session.query(Goals).filter_by(player_id=player_id).all()
+    return goals
+
+@app.get('/players')
+async def get_players():
+    players = db.session.query(Players).all()
+    return players
+
+@app.get('/players/{player_name}')
+async def get_player_by_name(player_name):
+    players = db.session.query(Players).filter(or_(Players.given_name.ilike(player_name), Players.family_name.ilike(player_name)))
+    
+    if players is None:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    return players
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
