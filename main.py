@@ -1,14 +1,13 @@
-import json
-import pandas as pd
+import sqlite3
 
-with open('worldcup.json', 'r', encoding='utf-8') as file:
-    data = json.load(file)
+conn = sqlite3.connect('./db/worldcup.db')
+cursor = conn.cursor()
+
+cursor.execute('SELECT * FROM tournaments')
+
+results = cursor.fetchall()
+
+for row in results:
+    print(row)
     
-dataframes = []
-for obj in data:
-    obj_list = [obj]
-    df = pd.DataFrame(obj_list)
-    dataframes.append(df)
-    
-combinedDF = pd.concat(dataframes, ignore_index=True)
-combinedDF.to_csv('worldcup.csv', index=False)
+conn.close()
