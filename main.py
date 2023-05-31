@@ -109,7 +109,15 @@ async def get_matches_by_country(country):
 
     return matches
 
+@app.get('/goals')
+async def get_goals():
+    goals = db.session.query(Goals).all()
+    return goals
 
+@app.get('/tournaments/{tournament_id}/goals')
+async def get_goals_by_tournament(tournament_id):
+    goals = db.session.query(Goals).filter_by(tournament_id=tournament_id).all()
+    return goals
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
