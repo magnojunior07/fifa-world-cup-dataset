@@ -1,8 +1,26 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey
+from datetime import datetime, timedelta
+from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
+class FormateDateColumn(Column):
+  
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            if isinstance(value, datetime):
+                reference_date = datetime(2000, 1, 1)
+                delta = value - reference_date
+                value = delta.days
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            reference_date = datetime(2000, 1, 1)
+            delta = timedelta(days=value)
+            value = reference_date + delta
+        return value
 
 class Tournaments(Base):
     __tablename__ = 'tournaments'
@@ -10,8 +28,8 @@ class Tournaments(Base):
     tournament_id = Column(String, primary_key=True)
     tournament_name = Column(String)
     year = Column(Integer)
-    start_date = Column(Date)
-    end_date = Column(Date)
+    start_date = FormateDateColumn()
+    end_date = FormateDateColumn()
     host_country = Column(String)
     winner = Column(String)
     host_won = Column(Boolean)
@@ -53,7 +71,7 @@ class Players(Base):
     player_id = Column(String, primary_key=True)
     family_name = Column(String)
     given_name = Column(String)
-    birth_date = Column(Date)
+    birth_date = FormateDateColumn()
     goal_keeper = Column(Boolean)
     defender = Column(Boolean)
     midfielder = Column(Boolean)
@@ -106,7 +124,7 @@ class Matches(Base):
     knockout_stage = Column(Boolean)
     replayed = Column(Boolean)
     replay = Column(Boolean)
-    match_date = Column(Text)
+    match_date = FormateDateColumn()
     match_time = Column(Text)
     stadium_id = Column(String, ForeignKey('stadiums.stadium_id'), nullable=False)
     home_team_id = Column(String, ForeignKey('teams.team_id'), nullable=False)
@@ -358,7 +376,7 @@ class HostCountries(Base):
     tournament = relationship('Tournaments')
     team = relationship('Teams')
     
-    class TournamentStages(Base):
+class TournamentStages(Base):
     __tablename__ = 'tournament_stages'
 
     tournament_id = Column(String, ForeignKey('tournaments.tournament_id'), primary_key=True)
@@ -367,8 +385,8 @@ class HostCountries(Base):
     group_stage = Column(Boolean)
     knockout_stage = Column(Boolean)
     unbalanced_groups = Column(Boolean)
-    start_date = Column(Date)
-    end_date = Column(Date)
+    start_date = FormateDateColumn()
+    end_date = FormateDateColumn()
     count_matches = Column(Integer)
     count_teams = Column(Integer)
     count_scheduled = Column(Integer)

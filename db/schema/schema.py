@@ -1,3 +1,4 @@
+from datetime import date
 from pydantic import BaseModel, Field
 from typing import List
 
@@ -12,13 +13,19 @@ class Tournaments(BaseModel):
     total_matches: int
     total_goals: int
     total_penalties: int
-
+    
+    class Config:
+        orm_mode = True
+        
 class Confederations(BaseModel):
     confederation_id: str
     confederation_name: str
     confederation_code: str
     confederation_wikipedia_link: str
 
+    class Config:
+        orm_mode = True
+        
 class Teams(BaseModel):
     team_id: str
     team_name: str
@@ -29,6 +36,9 @@ class Teams(BaseModel):
     team_wikipedia_link: str
     federation_wikipedia_link: str
 
+    class Config:
+        orm_mode = True
+        
 class Players(BaseModel):
     player_id: str
     family_name: str
@@ -41,13 +51,19 @@ class Players(BaseModel):
     count_tournaments: int
     list_tournaments: str
     player_wikipedia_link: str
-
+    
+    class Config:
+        orm_mode = True
+        
 class Managers(BaseModel):
     manager_id: str
     family_name: str
     given_name: str
     country_name: str
     manager_wikipedia_link: str
+ 
+    class Config:
+        orm_mode = True
 
 class Referees(BaseModel):
     referee_id: str
@@ -57,6 +73,9 @@ class Referees(BaseModel):
     confederation_id: str
     referee_wikipedia_link: str
 
+    class Config:
+        orm_mode = True
+        
 class Stadiums(BaseModel):
     stadium_id: str
     stadium_name: str
@@ -66,18 +85,30 @@ class Stadiums(BaseModel):
     stadium_wikipedia_link: str
     city_wikipedia_link: str
 
+    class Config:
+        orm_mode = True
+
 class ConfederationWithTeams(BaseModel):
     confederation: Confederations
     teams: List[Teams]
 
+    class Config:
+        orm_mode = True
+
 class ConfederationWithReferees(BaseModel):
     confederation: Confederations
     referees: List[Referees]
+    
+    class Config:
+        orm_mode = True
 
 class ConfederationWithStadiums(BaseModel):
     confederation: Confederations
     stadiums: List[Stadiums]
 
+    class Config:
+        orm_mode = True
+        
 class Matches(BaseModel):
     tournament_id: str
     match_id: str
@@ -108,18 +139,27 @@ class Matches(BaseModel):
     away_team_win: bool
     draw: bool
 
+    class Config:
+        orm_mode = True
+        
 class Awards(BaseModel):
     award_id: str
     award_name: str
     award_description: str
     year_introduced: int
 
+    class Config:
+        orm_mode = True
+        
 class QualifiedTeams(BaseModel):
     tournament_id: str
     team_id: str
     count_matches: int
     performance: str
 
+    class Config:
+        orm_mode = True
+        
 class Squads(BaseModel):
     tournament_id: str
     team_id: str
@@ -128,15 +168,24 @@ class Squads(BaseModel):
     position_name: str
     position_code: str
 
+    class Config:
+        orm_mode = True
+        
 class ManagerAppointments(BaseModel):
     tournament_id: str
     team_id: str
     manager_id: str
 
+    class Config:
+        orm_mode = True
+        
 class RefereeAppointments(BaseModel):
     tournament_id: str
     referee_id: str
 
+    class Config:
+        orm_mode = True
+        
 class TeamAppearances(BaseModel):
     tournament_id: str
     match_id: str
@@ -156,6 +205,9 @@ class TeamAppearances(BaseModel):
     lose: bool
     draw: bool
 
+    class Config:
+        orm_mode = True
+        
 class PlayerAppearances(BaseModel):
     tournament_id: str
     match_id: str
@@ -170,6 +222,9 @@ class PlayerAppearances(BaseModel):
     substitute: bool
     captain: bool
 
+    class Config:
+        orm_mode = True
+        
 class ManagerAppearances(BaseModel):
     tournament_id: str
     match_id: str
@@ -178,11 +233,17 @@ class ManagerAppearances(BaseModel):
     away_team: bool
     manager_id: str
 
+    class Config:
+        orm_mode = True
+        
 class RefereeAppearances(BaseModel):
     tournament_id: str
     match_id: str
     referee_id: str
 
+    class Config:
+        orm_mode = True
+        
 class Goals(BaseModel):
     goal_id: str
     tournament_id: str
@@ -200,6 +261,9 @@ class Goals(BaseModel):
     own_goal: bool
     penalty: bool
 
+    class Config:
+        orm_mode = True
+        
 class PenaltyKicks(BaseModel):
     penalty_kick_id: str
     tournament_id: str
@@ -211,6 +275,9 @@ class PenaltyKicks(BaseModel):
     shirt_number: int
     converted: bool
 
+    class Config:
+        orm_mode = True
+        
 class Bookings(BaseModel):
     booking_id: str
     tournament_id: str
@@ -229,6 +296,9 @@ class Bookings(BaseModel):
     second_yellow_card: bool
     sending_off: bool
 
+    class Config:
+        orm_mode = True
+        
 class Substitutions(BaseModel):
     substitution_id: str
     tournament_id: str
@@ -245,11 +315,17 @@ class Substitutions(BaseModel):
     going_off: bool
     coming_on: bool
 
+    class Config:
+        orm_mode = True
+        
 class HostCountries(BaseModel):
     tournament_id: str
     team_id: str
     performance: str
 
+    class Config:
+        orm_mode = True
+        
 class TournamentStages(BaseModel):
     tournament_id: str
     stage_number: int
@@ -266,6 +342,9 @@ class TournamentStages(BaseModel):
     count_playoffs: int
     count_walkovers: int
 
+    class Config:
+        orm_mode = True
+        
 class Groups(BaseModel):
     tournament_id: str
     stage_number: int
@@ -273,6 +352,9 @@ class Groups(BaseModel):
     group_name: str
     count_teams: int
 
+    class Config:
+        orm_mode = True
+        
 class GroupStandings(BaseModel):
     tournament_id: str
     stage_number: int
@@ -290,14 +372,24 @@ class GroupStandings(BaseModel):
     points: int
     advanced: bool
 
+    class Config:
+        orm_mode = True
+        
 class TournamentStandings(BaseModel):
     tournament_id: str
     position: int
     team_id: str
 
+    class Config:
+        orm_mode = True
+        
 class AwardWinners(BaseModel):
     tournament_id: str
     award_id: str
     shared: bool
     player_id: str
     team_id: str
+
+    class Config:
+        orm_mode = True
+        

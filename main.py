@@ -1,13 +1,22 @@
-import sqlite3
+import os
+import uvicorn
+from fastapi import FastAPI
+from fastapi_sqlalchemy import DBSessionMiddleware, db
+from db.models.models import Tournaments
 
-conn = sqlite3.connect('./db/worldcup.db')
-cursor = conn.cursor()
+app = FastAPI()
 
-cursor.execute('SELECT * FROM tournaments')
+db_file = os.path.abspath("./db/worldcup.db")
 
-results = cursor.fetchall()
+db_url = f"sqlite:///{db_file}"
 
-for row in results:
-    print(row)
-    
-conn.close()
+app.add_middleware(DBSessionMiddleware, db_url=db_url)
+
+@app.get('/tournaments')
+async def get_tournaments():
+    tournaments = db.session.query(Tournaments).all()
+    print(tournaments)
+    return tournaments
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
