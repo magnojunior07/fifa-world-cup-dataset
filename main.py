@@ -339,7 +339,19 @@ async def get_awards_by_award_id(award_id):
 
     return awards
 
+@app.get('/stadiums')
+async def get_stadiums():
+    stadiums = db.session.query(Stadiums).all()
+    return stadiums
 
+@app.get('/stadiums/{id}')
+async def get_stadium_by_id(id):
+    stadium = db.session.query(Stadiums).filter_by(stadium_id=id).first()
+    if stadium is None:
+        raise HTTPException(status_code=404, detail="Stadium not found")
+
+    return stadium
+    
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
