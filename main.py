@@ -3,7 +3,7 @@ import os
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi_sqlalchemy import DBSessionMiddleware, db
-from sqlalchemy.sql.expression import or_
+from sqlalchemy.sql.expression import or_, and_
 from db.models.models import *
 
 app = FastAPI()
@@ -155,7 +155,6 @@ async def get_goals_by_player(player_id):
     goals = db.session.query(Goals).filter_by(player_id=player_id).all()
     return goals
 
-
 @app.get('/players')
 async def get_players():
     players = db.session.query(Players).all()
@@ -178,7 +177,58 @@ async def get_player_by_id(player_id):
 
     return player
 
+@app.get('/players/{player_id}/appearances')
+async def get_player_appearances(player_id):
+    player_appearances = db.session.query(PlayerAppearances).filter_by(player_id=player_id).all()
+    if player_appearances is None:
+        raise HTTPException(status_code=404, detail="Player not found")
 
+    return player_appearances
+
+@app.get('/players/{player_id}/appearances/{tournament_id}')
+async def get_player_appearances_by_tournament(player_id, tournament_id):
+    player_appearances = db.session.query(PlayerAppearances).filter(and_(PlayerAppearances.player_id.ilike(player_id)), PlayerAppearances.tournament_id.ilike(tournament_id)).all()
+    if player_appearances is None:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    return player_appearances
+
+@app.get('/awards')
+async def get_awards():
+    awards = db.session.query(Awards).all()
+    return awards
+
+@app.get('/awards/winners')
+async def get_awards_winners():
+    awards_winners = db.session.query(AwardWinners).all()
+    return awards_winners
+
+@app.get('/awards/winners/player/{player_id}')
+async def get_awards_by_player(player_id):
+    awards = db.session.query(AwardWinners).filter_by(player_id=player_id).first()
+
+    if awards is None:
+        raise HTTPException(status_code=404, detail="Player not win a award")
+
+    return awards
+
+@app.get('/awards/winners/tournament{tournament_id}')
+async def get_awards_by_tournament(tournament_id):
+    awards = db.session.query(AwardWinners).filter_by(tournament_id=tournament_id).first()
+
+    if awards is None:
+        raise HTTPException(status_code=404, detail="Awards not found from this tournament")
+
+    return awards
+
+@app.get('/awards/winners/{award_id}')
+async def get_awards_by_award_id(award_id):
+    awards = db.session.query(AwardWinners).filter_by(award_id=award_id).first()
+
+    if awards is None:
+        raise HTTPException(status_code=404, detail="Winners not found from this award")
+
+    return awards
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
