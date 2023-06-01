@@ -44,6 +44,24 @@ async def get_qualifieds_by_tournament_id(id):
     
     return qualifieds
 
+@app.get('/tournaments/{id}/standings')
+async def get_standings_by_tournament(id):
+    standings = db.session.query(TournamentStandings).filter_by(tournament_id=id).all()
+    
+    return standings
+
+@app.get('/tournaments/{id}/groups')
+async def get_groups_by_tournament_id(id):
+    groups = db.session.query(Groups).filter_by(tournament_id=id).all()
+    
+    return groups
+
+@app.get('/tournaments/{id}/groups/standings')
+async def get_groups_standings_by_tournament_id(id):
+    groups_standings = db.session.query(GroupStandings).filter_by(tournament_id=id).all()
+    
+    return groups_standings
+
 @app.get('/tournaments/year/{year}/qualifieds')
 async def get_qualifieds_by_tournament_year(year):
     tournament = db.session.query(Tournaments).filter_by(year=int(year)).first()
@@ -160,7 +178,7 @@ async def get_players():
     players = db.session.query(Players).all()
     return players
 
-@app.get('/players/{player_name}')
+@app.get('/players/name/{player_name}')
 async def get_player_by_name(player_name):
     players = db.session.query(Players).filter(or_(Players.given_name.ilike(player_name), Players.family_name.ilike(player_name))).all()
     
@@ -205,16 +223,16 @@ async def get_awards_winners():
 
 @app.get('/awards/winners/player/{player_id}')
 async def get_awards_by_player(player_id):
-    awards = db.session.query(AwardWinners).filter_by(player_id=player_id).first()
+    awards = db.session.query(AwardWinners).filter_by(player_id=player_id).all()
 
     if awards is None:
         raise HTTPException(status_code=404, detail="Player not win a award")
 
     return awards
 
-@app.get('/awards/winners/tournament{tournament_id}')
+@app.get('/awards/winners/tournament/{tournament_id}')
 async def get_awards_by_tournament(tournament_id):
-    awards = db.session.query(AwardWinners).filter_by(tournament_id=tournament_id).first()
+    awards = db.session.query(AwardWinners).filter_by(tournament_id=tournament_id).all()
 
     if awards is None:
         raise HTTPException(status_code=404, detail="Awards not found from this tournament")
@@ -223,12 +241,14 @@ async def get_awards_by_tournament(tournament_id):
 
 @app.get('/awards/winners/{award_id}')
 async def get_awards_by_award_id(award_id):
-    awards = db.session.query(AwardWinners).filter_by(award_id=award_id).first()
+    awards = db.session.query(AwardWinners).filter_by(award_id=award_id).all()
 
     if awards is None:
         raise HTTPException(status_code=404, detail="Winners not found from this award")
 
     return awards
+
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
