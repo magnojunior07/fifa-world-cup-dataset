@@ -351,6 +351,11 @@ async def get_stadium_by_id(id):
         raise HTTPException(status_code=404, detail="Stadium not found")
 
     return stadium
+
+@app.get('/stadiums/country/{country}')
+async def get_stadium_by_country(country):
+    stadiums = db.session.query(Stadiums).filter(Stadiums.country_name.ilike(country)).all()
+    return stadiums
     
 
 if __name__ == "__main__":
