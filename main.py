@@ -249,6 +249,44 @@ async def get_manager_appearances_by_tournament(manager_id, tournament_id):
 
     return manager_appearances
 
+@app.get('/referees')
+async def get_referees():
+    referees = db.session.query(Referees).all()
+    return referees
+
+@app.get('/referees/name/{referee_name}')
+async def get_referee_by_name(referee_name):
+    referees = db.session.query(Referees).filter(or_(Referees.given_name.ilike(referee_name), Referees.family_name.ilike(referee_name))).all()
+    
+    if referees is None:
+        raise HTTPException(status_code=404, detail="referee not found")
+
+    return referees
+
+@app.get('/referees/{referee_id}')
+async def get_referee_by_id(referee_id):
+    referee = db.session.query(Referees).filter_by(referee_id=referee_id).first()
+    if referee is None:
+        raise HTTPException(status_code=404, detail="referee not found")
+
+    return referee
+
+@app.get('/referees/{referee_id}/appearances')
+async def get_referee_appearances(referee_id):
+    referee_appearances = db.session.query(RefereeAppearances).filter_by(referee_id=referee_id).all()
+    if referee_appearances is None:
+        raise HTTPException(status_code=404, detail="referee not found")
+
+    return referee_appearances
+
+@app.get('/referees/{referee_id}/appearances/{tournament_id}')
+async def get_referee_appearances_by_tournament(referee_id, tournament_id):
+    referee_appearances = db.session.query(RefereeAppearances).filter(and_(RefereeAppearances.referee_id.ilike(referee_id)), RefereeAppearances.tournament_id.ilike(tournament_id)).all()
+    if referee_appearances is None:
+        raise HTTPException(status_code=404, detail="referee not found")
+
+    return referee_appearances
+
 @app.get('/awards')
 async def get_awards():
     awards = db.session.query(Awards).all()
