@@ -211,6 +211,44 @@ async def get_player_appearances_by_tournament(player_id, tournament_id):
 
     return player_appearances
 
+@app.get('/managers')
+async def get_managers():
+    managers = db.session.query(Managers).all()
+    return managers
+
+@app.get('/managers/name/{manager_name}')
+async def get_manager_by_name(manager_name):
+    managers = db.session.query(Managers).filter(or_(Managers.given_name.ilike(manager_name), Managers.family_name.ilike(manager_name))).all()
+    
+    if managers is None:
+        raise HTTPException(status_code=404, detail="manager not found")
+
+    return managers
+
+@app.get('/managers/{manager_id}')
+async def get_manager_by_id(manager_id):
+    manager = db.session.query(Managers).filter_by(manager_id=manager_id).first()
+    if manager is None:
+        raise HTTPException(status_code=404, detail="manager not found")
+
+    return manager
+
+@app.get('/managers/{manager_id}/appearances')
+async def get_manager_appearances(manager_id):
+    manager_appearances = db.session.query(ManagerAppearances).filter_by(manager_id=manager_id).all()
+    if manager_appearances is None:
+        raise HTTPException(status_code=404, detail="manager not found")
+
+    return manager_appearances
+
+@app.get('/managers/{manager_id}/appearances/{tournament_id}')
+async def get_manager_appearances_by_tournament(manager_id, tournament_id):
+    manager_appearances = db.session.query(ManagerAppearances).filter(and_(ManagerAppearances.manager_id.ilike(manager_id)), ManagerAppearances.tournament_id.ilike(tournament_id)).all()
+    if manager_appearances is None:
+        raise HTTPException(status_code=404, detail="manager not found")
+
+    return manager_appearances
+
 @app.get('/awards')
 async def get_awards():
     awards = db.session.query(Awards).all()
