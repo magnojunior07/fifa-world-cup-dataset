@@ -38,6 +38,19 @@ async def get_tournaments_by_id(id):
 
     return tournament
 
+@app.get('/tournaments/{id}/qualifieds')
+async def get_qualifieds_by_tournament_id(id):
+    qualifieds = db.session.query(QualifiedTeams).filter_by(tournament_id=id).all()
+    
+    return qualifieds
+
+@app.get('/tournaments/year/{year}/qualifieds')
+async def get_qualifieds_by_tournament_year(year):
+    tournament = db.session.query(Tournaments).filter_by(year=int(year)).first()
+    qualifieds = db.session.query(QualifiedTeams).filter_by(tournament_id=tournament.tournament_id).all()
+    
+    return qualifieds
+
 @app.get('/tournaments/year/{year}')
 async def get_tournaments_by_year(year):
     tournament = db.session.query(Tournaments).filter_by(year=int(year)).first()
@@ -109,6 +122,24 @@ async def get_matches_by_country(country):
 
     return matches
 
+@app.get('/country/{country}/goals')
+async def get_goals_by_country(country):
+    country = db.session.query(Teams).filter(Teams.team_name.ilike(country)).first()
+    goals = db.session.query(Goals).filter_by(team_id=country.team_id).all()
+    return goals
+
+
+@app.get('/country/{country}/players')
+async def get_players_by_country(country):
+    country = db.session.query(Teams).filter(Teams.team_name.ilike(country)).first()
+    squads = db.session.query(Squads).filter_by(team_id=country.team_id).all()
+    players = []
+    for squad in squads:
+        player = db.session.query(Players).filter_by(player_id=squad.player_id).first()
+        players.append(player)
+    
+    return players
+
 @app.get('/goals')
 async def get_goals():
     goals = db.session.query(Goals).all()
@@ -124,6 +155,7 @@ async def get_goals_by_player(player_id):
     goals = db.session.query(Goals).filter_by(player_id=player_id).all()
     return goals
 
+
 @app.get('/players')
 async def get_players():
     players = db.session.query(Players).all()
@@ -137,6 +169,15 @@ async def get_player_by_name(player_name):
         raise HTTPException(status_code=404, detail="Player not found")
 
     return players
+
+@app.get('/players/{player_id}')
+async def get_player_by_id(player_id):
+    player = db.session.query(Players).filter_by(player_id=player_id).first()
+    if player is None:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    return player
+
 
 
 if __name__ == "__main__":
