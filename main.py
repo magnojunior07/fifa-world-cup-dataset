@@ -119,6 +119,21 @@ async def get_matches_by_tournament(id):
     match.match_date = formate_date(float(match.match_date))
     return match
 
+@app.get('/match/{id}/bookings')
+async def get_bookings_by_match(id):
+    bookings = db.session.query(Bookings).filter_by(match_id=id).all()    
+    return bookings
+
+@app.get('/match/{id}/substituitions')
+async def get_substituitions_by_match(id):
+    substituitions = db.session.query(Substitutions).filter_by(match_id=id).all()    
+    return substituitions
+
+@app.get('/match/{id}/goals')
+async def get_goals_by_match(id):
+    goals = db.session.query(Goals).filter_by(match_id=id).all()    
+    return goals
+
 @app.get('/matches/country/{country}')
 async def get_matches_by_country(country):
     country = db.session.query(Teams.team_id).filter(Teams.team_name.ilike(country)).first()
